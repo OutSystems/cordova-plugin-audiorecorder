@@ -28,7 +28,7 @@ function onDeviceReady() {
 - Run the following command:
 
 ```shell
-    cordova plugin add 
+    cordova plugin add https://github.com/OutSystems/cordova-plugin-audiorecorder.git
 ``` 
 ---
 
