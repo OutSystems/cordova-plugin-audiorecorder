@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+           id="com.outsystems.audiorecorder"
+      version="1.0.0">
+    <name>AudioRecorder Plugin</name>
+    <description>Record Audio easily with the device microphone.</description>
+    <license>MIT License</license>
+    <keywords>cordova, outsystems, record, microphone, audio</keywords>
+    <repo></repo>
+    <issue></issue>
+
+    <js-module src="www/AudioRecorder.js" name="AudioRecorder">
+        <clobbers target="navigator.device.audiorecorder" />
+    </js-module>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="AudioRecorderPlugin">
+                <param name="ios-package" value="AudioRecorderPlugin" />
+            </feature>
+        </config-file>
+        <header-file src="src/ios/AudioRecorderPlugin.h" />
+        <source-file src="src/ios/AudioRecorderPlugin.m" />
+        <header-file src="src/ios/AudioRecorderVC.h" />
+        <source-file src="src/ios/AudioRecorderVC.m" />
+        <resource-file src="src/ios/OSAudioRecorder.bundle" />
+    
+    <!-- System frameworks -->
+    
+    </platform>
+    
+    <!-- Android -->
+    <platform name="android">
+        
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="AudioRecorderPlugin">
+                <param name="android-package" value="com.outsystems.audiorecorder.AudioRecorderPlugin"/>
+            </feature>
+        </config-file>
+        
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.RECORD_AUDIO" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.VIBRATE" />
+        </config-file>
+        
+        <source-file src="src/android/AudioRecorderPlugin.java" target-dir="src/com/outsystems/audiorecorder" />
+        <source-file src="src/android/AudioRecorderListener.java" target-dir="src/com/outsystems/audiorecorder" />
+        <source-file src="src/android/AudioRecorderView.java" target-dir="src/com/outsystems/audiorecorder" />
+        <source-file src="src/android/FileManager.java" target-dir="src/com/outsystems/audiorecorder" />
+        
+        <source-file src="src/android/res/anim/bottom_down.xml" target-dir="res/anim"/>
+        <source-file src="src/android/res/anim/bottom_up.xml" target-dir="res/anim"/>
+        <source-file src="src/android/res/layout/view_audio_recorder.xml" target-dir="res/layout"/>
+        <source-file src="src/android/res/mdpi/ic_close_audio.png" target-dir="res/drawable-mdpi"/>
+        <source-file src="src/android/res/mdpi/ic_done_audio.png" target-dir="res/drawable-mdpi"/>
+        <source-file src="src/android/res/mdpi/ic_mic_audio.png" target-dir="res/drawable-mdpi"/>
+        <source-file src="src/android/res/mdpi/ic_play_arrow_audio.png" target-dir="res/drawable-mdpi"/>
+        <source-file src="src/android/res/mdpi/ic_stop_audio.png" target-dir="res/drawable-mdpi"/>
+        
+        <source-file src="src/android/res/hdpi/ic_close_audio.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="src/android/res/hdpi/ic_done_audio.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="src/android/res/hdpi/ic_mic_audio.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="src/android/res/hdpi/ic_play_arrow_audio.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="src/android/res/hdpi/ic_stop_audio.png" target-dir="res/drawable-hdpi"/>
+        
+        <source-file src="src/android/res/xhdpi/ic_close_audio.png" target-dir="res/drawable-xhdpi"/>
+        <source-file src="src/android/res/xhdpi/ic_done_audio.png" target-dir="res/drawable-xhdpi"/>
+        <source-file src="src/android/res/xhdpi/ic_mic_audio.png" target-dir="res/drawable-xhdpi"/>
+        <source-file src="src/android/res/xhdpi/ic_play_arrow_audio.png" target-dir="res/drawable-xhdpi"/>
+        <source-file src="src/android/res/xhdpi/ic_stop_audio.png" target-dir="res/drawable-xhdpi"/>
+        
+        <source-file src="src/android/res/xxhdpi/ic_close_audio.png" target-dir="res/drawable-xxhdpi"/>
+        <source-file src="src/android/res/xxhdpi/ic_done_audio.png" target-dir="res/drawable-xxhdpi"/>
+        <source-file src="src/android/res/xxhdpi/ic_mic_audio.png" target-dir="res/drawable-xxhdpi"/>
+        <source-file src="src/android/res/xxhdpi/ic_play_arrow_audio.png" target-dir="res/drawable-xxhdpi"/>
+        <source-file src="src/android/res/xxhdpi/ic_stop_audio.png" target-dir="res/drawable-xxhdpi"/>
+        
+        <source-file src="src/android/res/xxxhdpi/ic_close_audio.png" target-dir="res/drawable-xxxhdpi"/>
+        <source-file src="src/android/res/xxxhdpi/ic_done_audio.png" target-dir="res/drawable-xxxhdpi"/>
+        <source-file src="src/android/res/xxxhdpi/ic_mic_audio.png" target-dir="res/drawable-xxxhdpi"/>
+        <source-file src="src/android/res/xxxhdpi/ic_play_arrow_audio.png" target-dir="res/drawable-xxxhdpi"/>
+        <source-file src="src/android/res/xxxhdpi/ic_stop_audio.png" target-dir="res/drawable-xxxhdpi"/>
+    </platform>
+    
+</plugin>
