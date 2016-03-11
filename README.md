@@ -121,16 +121,16 @@ Possible `error_code` values:
 #### How it looks
 
 - Main screen
-![Imgur](http://i.imgur.com/QhLiRDl.png =50x50)
+![Imgur](http://i.imgur.com/QhLiRDlm.png =50x50)
 
 - Recording screen
-![Imgur](http://i.imgur.com/EnMi0XD.png =50x50)
+![Imgur](http://i.imgur.com/EnMi0XDm.png =50x50)
 
 - Stop recording screen
-![Imgur](http://i.imgur.com/kzT2mug.png=50x50)
+![Imgur](http://i.imgur.com/kzT2mugm.png=50x50)
 
 - Play recording screen
-![Imgur](http://i.imgur.com/s10ijTb.png =50x50)
+![Imgur](http://i.imgur.com/s10ijTbm.png =50x50)
 
 
 ---
