@@ -120,16 +120,16 @@ Possible `error_code` values:
 
 #### How it looks
 
-- Main screen
+Main screen <br />
 ![Imgur](http://i.imgur.com/QhLiRDlm.png =50x50)
 
-- Recording screen
+Recording screen <br />
 ![Imgur](http://i.imgur.com/EnMi0XDm.png =50x50)
 
-- Stop recording screen
+Stop recording screen <br />
 ![Imgur](http://i.imgur.com/kzT2mugm.png=50x50)
 
-- Play recording screen
+Play recording screen <br />
 ![Imgur](http://i.imgur.com/s10ijTbm.png =50x50)
 
 
