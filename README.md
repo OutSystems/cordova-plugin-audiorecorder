@@ -120,8 +120,6 @@ Possible `error_code` values:
 
 #### How it looks
 
-Main screen <br />
-![Imgur](http://i.imgur.com/QhLiRDlm.png =50x50)
 
 Recording screen <br />
 ![Imgur](http://i.imgur.com/EnMi0XDm.png =50x50)
