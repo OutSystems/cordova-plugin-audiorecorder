@@ -31,12 +31,23 @@ typedef NS_ENUM(NSUInteger, OSRecorderState) {
 @property (weak, nonatomic) IBOutlet UIButton *pcRightButton;
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 
+//images static
 @property (strong, nonatomic) UIImage* stopImage;
 @property (strong, nonatomic) UIImage* playImage;
 @property (strong, nonatomic) UIImage* micImage;
 @property (strong, nonatomic) UIImage* clearImage;
 @property (strong, nonatomic) UIImage* doneImage;
 @property (strong, nonatomic) UIImage* closeImage;
+
+//images clicked
+@property (strong, nonatomic) UIImage* stopImageClicked;
+@property (strong, nonatomic) UIImage* playImageClicked;
+@property (strong, nonatomic) UIImage* micImageClicked;
+@property (strong, nonatomic) UIImage* clearImageClicked;
+@property (strong, nonatomic) UIImage* doneImageClicked;
+@property (strong, nonatomic) UIImage* closeImageClicked;
+
+
 
 @property (strong) UIColor* backgroundColor;
 @property (strong) UIColor* viewsColor;
@@ -322,6 +333,7 @@ typedef NS_ENUM(NSUInteger, OSRecorderState) {
     
     if(self.previousState == OS_STATE_RECORD && self.state == OS_STATE_RECORDING) {
         [self.recordButton setImage:self.stopImage forState:UIControlStateNormal];
+        [self.recordButton setImage:self.stopImageClicked forState:UIControlStateHighlighted];
     }
     
     if(self.previousState == OS_STATE_RECORDING && self.state == OS_STATE_PLAY) {
@@ -338,6 +350,7 @@ typedef NS_ENUM(NSUInteger, OSRecorderState) {
     
     if(self.previousState == OS_STATE_PLAY && self.state == OS_STATE_PLAYING) {
         [self.pcMiddleButton setImage:self.stopImage forState:UIControlStateNormal];
+        [self.recordButton setImage:self.stopImageClicked forState:UIControlStateHighlighted];
     }
     
     if(self.previousState == OS_STATE_PLAYING && self.state == OS_STATE_PLAY) {
@@ -354,22 +367,46 @@ typedef NS_ENUM(NSUInteger, OSRecorderState) {
     self.state = OS_STATE_NOT_INIT;
 }
 
-- (void)viewDidLoad {
-
-    [self.timerLabel setText:@"0:00"];
-
-    self.clearImage = [[UIImage imageNamed:@"OSAudioRecorder.bundle/ic_clear_white_48pt"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.doneImage = [[UIImage imageNamed:@"OSAudioRecorder.bundle/ic_done_white_48pt"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.closeImage =  [[UIImage imageNamed:@"OSAudioRecorder.bundle/ic_highlight_off_white_48pt"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.playImage = [[UIImage imageNamed:@"OSAudioRecorder.bundle/ic_play_arrow_white_48pt"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.stopImage = [[UIImage imageNamed:@"OSAudioRecorder.bundle/ic_stop_white_48pt"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.micImage = [[UIImage imageNamed:@"OSAudioRecorder.bundle/ic_mic_white_48pt"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-
+- (void)viewDidAppear:(BOOL)animatedAppear
+{
+   [super viewDidAppear:YES];
+    self.clearImage = [UIImage imageNamed:@"OSAudioRecorder.bundle/reject"];
+    self.doneImage = [UIImage imageNamed:@"OSAudioRecorder.bundle/accept"];
+    self.closeImage =  [UIImage imageNamed:@"OSAudioRecorder.bundle/close"];
+    //missing play button here
+    self.playImage = [UIImage imageNamed:@"OSAudioRecorder.bundle/play_record"];
+    self.stopImage = [UIImage imageNamed:@"OSAudioRecorder.bundle/stop_recording"];
+    self.micImage = [UIImage imageNamed:@"OSAudioRecorder.bundle/record"];
+    
     [self.cancelButton setImage:self.closeImage forState:UIControlStateNormal];
     [self.pcLeftButton setImage:self.clearImage forState:UIControlStateNormal];
     [self.pcMiddleButton setImage:self.playImage forState:UIControlStateNormal];
     [self.pcRightButton setImage:self.doneImage forState:UIControlStateNormal];
     [self.recordButton setImage:self.micImage forState:UIControlStateNormal];
+    
+    //set for images for clicked
+    self.clearImageClicked = [UIImage imageNamed:@"OSAudioRecorder.bundle/reject_pressed"];
+    self.doneImageClicked = [UIImage imageNamed:@"OSAudioRecorder.bundle/accept_pressed"];
+    self.closeImageClicked =  [UIImage imageNamed:@"OSAudioRecorder.bundle/Close pressed"];
+    //missing play button here
+    self.playImageClicked = [UIImage imageNamed:@"OSAudioRecorder.bundle/play_record_pressed"];
+    self.stopImageClicked = [UIImage imageNamed:@"OSAudioRecorder.bundle/Stop Recording pressed"];
+    self.micImageClicked = [UIImage imageNamed:@"OSAudioRecorder.bundle/Record pressed"];
+    
+    
+    //set the state
+    [self.cancelButton setImage:self.closeImageClicked forState:UIControlStateHighlighted];
+    [self.pcLeftButton setImage:self.clearImageClicked forState:UIControlStateHighlighted];
+    [self.pcMiddleButton setImage:self.playImageClicked forState:UIControlStateHighlighted];
+    [self.pcRightButton setImage:self.doneImageClicked forState:UIControlStateHighlighted];
+    [self.recordButton setImage:self.micImageClicked forState:UIControlStateHighlighted];
+}
+
+- (void)viewDidLoad {
+
+    [self.timerLabel setText:@"0:00"];
+
+    
     
     [self.timerLabel  setTextColor:self.viewsColor];
     [self.cancelButton setTintColor:self.viewsColor];
@@ -385,6 +422,7 @@ typedef NS_ENUM(NSUInteger, OSRecorderState) {
         [self prepareRecordSession];
     }
     [super viewDidLoad];
+    [self viewDidAppear:YES];
 }
 
 - (void)updateTime

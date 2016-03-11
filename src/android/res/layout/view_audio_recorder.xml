@@ -14,7 +14,8 @@
         android:layout_margin="30dp"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_close_audio"/>
+        android:src="@drawable/close_button"
+        />
 
     <ViewSwitcher
         android:id="@+id/viewSwitcher_audio_recorder"
@@ -29,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingBottom="20dp"
             android:paddingTop="20dp">
 
@@ -38,6 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="00:00"
+                android:paddingBottom="5dp"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="20sp"/>
 
@@ -45,12 +47,11 @@
                 android:id="@+id/img_button_start_record"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_mic_audio"/>
+                android:src="@drawable/record_button"/>
 
            <!-- <ImageButton
                 android:id="@+id/button_stop_record"
@@ -82,7 +83,7 @@
                 android:layout_marginRight="30dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_close_audio"/>
+                android:src="@drawable/reject_button"/>
 
 
             <ImageButton
@@ -94,7 +95,7 @@
                 android:layout_marginRight="30dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_play_arrow_audio"/>
+                android:src="@drawable/play_button"/>
 
             <ImageButton
                 android:id="@+id/img_button_accept_audio"
@@ -105,7 +106,7 @@
                 android:layout_marginRight="30dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_done_audio"/>
+                android:src="@drawable/done_button"/>
         </LinearLayout>
     </ViewSwitcher>
 </RelativeLayout>

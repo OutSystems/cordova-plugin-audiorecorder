@@ -118,11 +118,29 @@ Possible `error_code` values:
 
 ---
 
+#### How it looks
+
+- Main screen
+![myimage-alt-tag](http://i.imgur.com/QhLiRDl.png =100x100)
+
+- Recording screen
+![myimage-alt-tag](http://i.imgur.com/EnMi0XD.png =100x100)
+
+- Stop recording screen
+![myimage-alt-tag](http://i.imgur.com/kzT2mug.png =100x100)
+
+- Play recording screen
+![myimage-alt-tag](http://i.imgur.com/s10ijTb.png =100x100)
+
+
+---
+
 #### Contributors
 - OutSystems - Mobility Experts
     - João Gonçalves, <joao.goncalves@outsystems.com>
     - Rúben Gonçalves, <ruben.goncalves@outsystems.com>
     - Vitor Oliveira, <vitor.oliveira@outsystems.com>
+    - Danilo Costa, <danilo.costa@outsystems.com>
 
 #### Document author
 - João Gonçalves, <joao.goncalves@outsystems.com>
