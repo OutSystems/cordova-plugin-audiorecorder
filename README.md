@@ -42,7 +42,7 @@ function onDeviceReady() {
 ---
 
 <a name="recordAudio"></a>
-#### `navigator.device.audiorecorder.recordAudio(successCallback, errorCallback, durationLimit, viewColor, backgroundColor)`
+#### Record Audio file
 
 Calling this method opens the native GUI for the recorder.
 
@@ -51,13 +51,9 @@ Calling this method opens the native GUI for the recorder.
 | successCallback   | [`Function`](#successCallback)  | Callback function called when successfully recorded an audio file. |
 | errorCallback     | [`Function`](#errorCallback)    | Callback function called when an error occurs |
 | durationLimit     | Integer    | Duration, in seconds, of the recording. Recording stop when reaching the duration limit. |
-| viewColor         | String    | An hexadecimal color, in the format `"#FFFFFF"`. Sets the tint color of the action buttons and timer label |
-| backgroundColor   | String    | An hexadecimal color, in the format `"#FFFFFF"`. Sets the color of the background opaque area. |
-
-
 
 <a name="deleteAudioFile"></a>
-#### `navigator.device.audiorecorder.deleteAudioFile(successCallback, errorCallback, filepath)`
+#### Delete Audio file
 
 Deletes an audio file given its filepath
 
