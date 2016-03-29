@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="com.outsystems.audiorecorder"
-      version=“1.0.2”>
+      version= "1.0.2">
     <name>AudioRecorder Plugin</name>
     <description>Record Audio easily with the device microphone.</description>
     <license>MIT License</license>
