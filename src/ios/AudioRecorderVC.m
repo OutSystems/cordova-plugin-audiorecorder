@@ -118,9 +118,9 @@ typedef NS_ENUM(NSUInteger, OSRecorderState) {
     int i = 1;
     do {
         if(containerExists){
-            filePath = [NSString stringWithFormat:@"%@/temp_%03d.aac", containerPath, i++];
+            filePath = [NSString stringWithFormat:@"%@/temp_%03d.mp4", containerPath, i++];
         } else {
-            filePath = [NSString stringWithFormat:@"%@/temp_%03d.aac", docsPath, i++];
+            filePath = [NSString stringWithFormat:@"%@/temp_%03d.mp4", docsPath, i++];
         }
     } while ([fileMgr fileExistsAtPath:filePath]);
     
@@ -298,6 +298,7 @@ typedef NS_ENUM(NSUInteger, OSRecorderState) {
 - (void) playRecordedAudio {
     
     if(![self avAudioPlayer]) {
+
         self.avAudioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:[self.avAudioRecorder url] error:nil];
         [self.avAudioPlayer setDelegate:self];
     }

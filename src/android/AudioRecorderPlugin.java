@@ -68,7 +68,7 @@ public class AudioRecorderPlugin extends CordovaPlugin {
                     try {
                         limitation = args.getInt(0);
                     } catch (JSONException e) {
-                        sendErrorCallBack(callbackContext, ERROR_INVALID_ARGUMENTS, "Limitation Time is invalid");
+                       // sendErrorCallBack(callbackContext, ERROR_INVALID_ARGUMENTS, "Limitation Time is invalid");
                         Log.e(LOG_TAG, e.toString());
                     }
 
