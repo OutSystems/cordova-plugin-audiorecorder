@@ -21,6 +21,9 @@
                 <param name="ios-package" value="AudioRecorderPlugin" />
             </feature>
         </config-file>
+        <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
+            <string>This app requires microphone access to record audio.</string>
+        </config-file>
         <header-file src="src/ios/AudioRecorderPlugin.h" />
         <source-file src="src/ios/AudioRecorderPlugin.m" />
         <header-file src="src/ios/AudioRecorderVC.h" />
