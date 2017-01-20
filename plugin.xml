@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="com.outsystems.audiorecorder"
-      version= "1.0.2">
+      version= "1.0.3">
     <name>AudioRecorder Plugin</name>
     <description>Record Audio easily with the device microphone.</description>
     <license>MIT License</license>
@@ -124,21 +124,6 @@
         <source-file src="src/android/res/xxhdpi/ic_reject_audio_pressed.png" target-dir="res/drawable-xxhdpi"/>
         <source-file src="src/android/res/xxhdpi/ic_stop_audio.png" target-dir="res/drawable-xxhdpi"/>
         <source-file src="src/android/res/xxhdpi/ic_stop_audio_pressed.png" target-dir="res/drawable-xxhdpi"/>
-        
-        <!-- Resources xxxhdpi -->
-        <source-file src="src/android/res/xxxhdpi/ic_close_audio.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_close_audio_pressed.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_done_audio.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_done_audio_pressed.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_mic_audio.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_mic_audio_pressed.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_play_arrow_audio.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_play_arrow_audio_pressed.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_reject_audio.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_reject_audio_pressed.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_stop_audio.png" target-dir="res/drawable-xxxhdpi"/>
-        <source-file src="src/android/res/xxxhdpi/ic_stop_audio_pressed.png" target-dir="res/drawable-xxxhdpi"/>
-
     </platform>
     
 </plugin>
