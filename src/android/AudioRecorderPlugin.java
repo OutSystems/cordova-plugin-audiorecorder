@@ -1,12 +1,12 @@
 package com.outsystems.audiorecorder;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
-
-import com.outsystems.android.R;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -26,16 +26,19 @@ public class AudioRecorderPlugin extends CordovaPlugin {
     public static final String ACTION_RECORD_AUDIO = "recordAudio";
     public static final String ACTION_DELETE_AUDIO = "deleteAudioFile";
     public static final String LOG_TAG = "OS_AUDIO_RECORDER";
-
+    private AudioRecorderView mAudioRecorderView;
     private CallbackContext callbackContext;
-
-    AudioRecorderView mAudioRecorderView;
+    private JSONArray args;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
         if (action.equals(ACTION_RECORD_AUDIO)) {
-            recordAudio(callbackContext, args);
+            this.callbackContext = callbackContext;
+            this.args = args;
+            if (checkPermissions()) {
+                recordAudio(callbackContext, args);
+            }
         } else if (action.equals(ACTION_DELETE_AUDIO)) {
             deleteAudioFile(callbackContext, args);
         }
@@ -43,8 +46,27 @@ public class AudioRecorderPlugin extends CordovaPlugin {
         return true;
     }
 
+    private boolean checkPermissions() {
+        if (cordova.hasPermission(Manifest.permission.RECORD_AUDIO)) {
+            return true;
+        } else {
+            cordova.requestPermission(this, 1337, Manifest.permission.RECORD_AUDIO);
+            return false;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+        if (requestCode == 1337) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                recordAudio(callbackContext, args);
+            }
+        }
+    }
+
     /**
      * Record audio
+     *
      * @param callbackContext
      * @param args
      * @throws JSONException
@@ -53,8 +75,10 @@ public class AudioRecorderPlugin extends CordovaPlugin {
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Animation bottomUp = AnimationUtils.loadAnimation(cordova.getActivity(),
-                        R.anim.bottom_up);
+
+                final int bottom_upResId = cordova.getActivity().getResources().getIdentifier("bottom_up", "anim", cordova.getActivity().getPackageName());
+
+                Animation bottomUp = AnimationUtils.loadAnimation(cordova.getActivity(), bottom_upResId);
                 mAudioRecorderView = new AudioRecorderView(cordova.getActivity(), null);
 
                 mAudioRecorderView.startAnimation(bottomUp);
@@ -68,7 +92,7 @@ public class AudioRecorderPlugin extends CordovaPlugin {
                     try {
                         limitation = args.getInt(0);
                     } catch (JSONException e) {
-                       // sendErrorCallBack(callbackContext, ERROR_INVALID_ARGUMENTS, "Limitation Time is invalid");
+                        // sendErrorCallBack(callbackContext, ERROR_INVALID_ARGUMENTS, "Limitation Time is invalid");
                         Log.e(LOG_TAG, e.toString());
                     }
 
@@ -105,7 +129,8 @@ public class AudioRecorderPlugin extends CordovaPlugin {
     }
 
     /**
-     * Delete recorded file from the disk. 
+     * Delete recorded file from the disk.
+     *
      * @param callbackContext
      * @param args
      * @throws JSONException
@@ -119,11 +144,10 @@ public class AudioRecorderPlugin extends CordovaPlugin {
 
             boolean result = new FileManager(cordova.getActivity()).deleteFileByPath(fileName);
 
-            if(result) {
+            if (result) {
                 Log.d(LOG_TAG, "File Deleted");
                 callbackContext.success();
-            }
-            else
+            } else
                 sendErrorCallBack(callbackContext, ERROR_INTERNAL, "Error to delete file");
 
         }
@@ -131,6 +155,7 @@ public class AudioRecorderPlugin extends CordovaPlugin {
 
     /**
      * Helper method to report an error to the webview.
+     *
      * @param callbackContext
      * @param errorCode
      * @param errorMessage
@@ -149,9 +174,11 @@ public class AudioRecorderPlugin extends CordovaPlugin {
     /**
      * Remove the Audio Recorder View from the screen
      */
-    private void removeCustomView(){
+    private void removeCustomView() {
+        final int animResId = cordova.getActivity()
+                .getResources().getIdentifier("bottom_down", "anim", cordova.getActivity().getPackageName());
         Animation slideOutBottom = AnimationUtils.loadAnimation(cordova.getActivity(),
-                R.anim.bottom_down);
+                animResId);
         mAudioRecorderView.startAnimation(slideOutBottom);
         try {
             ((ViewGroup) mAudioRecorderView.getParent()).removeView(mAudioRecorderView);

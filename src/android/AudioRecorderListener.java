@@ -6,6 +6,7 @@ package com.outsystems.audiorecorder;
 public interface AudioRecorderListener {
 
     public void callBackSuccessRecordVideo(String fullPath, String fileName);
+
     public void callBackErrorRecordVideo(int errorCode, String errorMessage);
-    
+
 }

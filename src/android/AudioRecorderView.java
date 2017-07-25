@@ -1,19 +1,17 @@
 package com.outsystems.audiorecorder;
 
+import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.AttributeSet;
@@ -25,9 +23,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
-import com.outsystems.android.R;
-
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -48,15 +43,9 @@ public class AudioRecorderView extends RelativeLayout {
     // Views
     ViewSwitcher mViewSwitcher;
     TextView textViewCounter;
-
-    // Player and Recorder
-    private MediaRecorder mRecorder = null;
-    private MediaPlayer mPlayer = null;
-
     // Handlers and Listners
     Handler handler;
     AudioRecorderListener mAudioRecorderListener;
-
     // Helpers
     boolean isRecording;
     int recordLimitTime = 0;
@@ -65,6 +54,151 @@ public class AudioRecorderView extends RelativeLayout {
     int colorBackground;
     String fileName;
     String filePath;
+    // Initialization of Runnable to update counter of time record
+    Runnable UpdateRecordTime = new Runnable() {
+        public void run() {
+            if (isRecording) {
+                if (recordTime == 60) {
+                    recordTime = 0;
+                    minutes++;
+                }
+                textViewCounter.setText(String.valueOf("" + (minutes > 9 ? minutes : "0" + minutes) + ":" + (recordTime > 9 ? recordTime : "0" + recordTime)));
+                recordTime += 1;
+// Delay 1s before next call
+                handler.postDelayed(this, 1000);
+            }
+        }
+    };
+    // Player and Recorder
+    private MediaRecorder mRecorder = null;
+    private MediaPlayer mPlayer = null;
+    private OnClickListener onClickListenerStartRecord = new OnClickListener() {
+        @Override
+        public void onClick(final View v) {
+//v.setSelected(true);
+            if (!isRecording) {
+                vibrate();
+                final int stop_button = v.getContext().getResources().getIdentifier("stop_button", "drawable", v.getContext().getPackageName());
+                setStopImageDrawable(v, stop_button);
+                mRecorder = new MediaRecorder();
+                mRecorder.setAudioSource(AUDIO_SOURCE);
+                mRecorder.setOutputFormat(OUTPUT_FORMAT);
+
+// Generate file name and get the path to save the files
+                FileManager fileManager = new FileManager(getContext());
+                fileName = fileManager.createFileName(EXTENSION_FILE);
+                filePath = fileManager.getFileName(fileName);
+
+                mRecorder.setOutputFile(filePath);
+                mRecorder.setAudioEncoder(AUDIO_ENCODER);
+// If on the plugin receive as a parameter the record limit time, should be defined on Media Recorder
+                if (recordLimitTime > 0)
+                    mRecorder.setMaxDuration(recordLimitTime);
+
+                mRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+                    @Override
+                    public void onInfo(MediaRecorder mr, int what, int extra) {
+                        if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED)
+                            stopRecord((ImageButton) v);
+                    }
+                });
+
+                try {
+                    mRecorder.prepare();
+
+                    mRecorder.start();
+                    isRecording = true;
+                    handler.post(UpdateRecordTime);
+                } catch (IOException e) {
+                    Log.e(AudioRecorderPlugin.LOG_TAG, "prepare() failed");
+                    sendErrorCallback(AudioRecorderPlugin.ERROR_INTERNAL, "Failed on start record");
+                }
+            } else if (isRecording) {
+                stopRecord((ImageButton) v);
+            }
+        }
+    };
+    private OnClickListener onClickListenerPlayRecord = new OnClickListener() {
+
+        @Override
+        public void onClick(final View v) {
+            if (mPlayer == null || !mPlayer.isPlaying()) {
+                final int stop_button = v.getContext().getResources().getIdentifier("stop_button", "drawable", v.getContext().getPackageName());
+                setStopImageDrawable(v, stop_button);
+                mPlayer = new MediaPlayer();
+                try {
+                    if (filePath != null && !filePath.isEmpty()) {
+                        Log.e("AudioRecord", filePath);
+                        mPlayer.reset();
+                        FileInputStream fis = new FileInputStream(filePath);
+                        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                        mPlayer.setDataSource(fis.getFD());
+                        mPlayer.prepare();
+                        mPlayer.start();
+
+
+                        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                Log.i(AudioRecorderPlugin.LOG_TAG, "OnCompletion Player");
+
+                                stopMediaPlayer((ImageButton) v);
+                            }
+                        });
+                    }
+                } catch (IOException e) {
+                    Log.e(AudioRecorderPlugin.LOG_TAG, "prepare() failed", e);
+                    sendErrorCallback(AudioRecorderPlugin.ERROR_INTERNAL, "Failed on start player");
+                }
+            } else {
+                mPlayer.stop();
+                stopMediaPlayer((ImageButton) v);
+            }
+        }
+    };
+    private OnClickListener onClickListenerRejectAudio = new OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            if (mPlayer != null && mPlayer.isPlaying()) {
+                mPlayer.release();
+                mPlayer = null;
+            }
+
+// Delete file when the clip is rejected
+            if (new FileManager(getContext()).deleteFileByName(fileName))
+                Log.i(AudioRecorderPlugin.LOG_TAG, "File delete with success");
+            textViewCounter.setText("00:00");
+            final int img_button_play = v.getContext().getResources().getIdentifier("img_button_play", "id", v.getContext().getPackageName());
+            final int play_button = v.getContext().getResources().getIdentifier("play_button", "drawable", v.getContext().getPackageName());
+
+            setStopImageDrawable(findViewById(img_button_play), play_button);
+
+            mViewSwitcher.showPrevious();
+        }
+    };
+    private OnClickListener onClickListenerAcceptAudio = new OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            stopMediaPlayer(null);
+
+            sendSuccessCallback(filePath, fileName);
+        }
+    };
+    private OnClickListener onClickListenerCloseView = new OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+// Delete file when close the view
+            if (new FileManager(getContext()).deleteFileByName(fileName))
+                Log.i(AudioRecorderPlugin.LOG_TAG, "File delete with success");
+
+            stopRecord(null);
+            stopMediaPlayer(null);
+            sendErrorCallback(AudioRecorderPlugin.ERROR_CODE_CANCEL, "The audio record was canceled.");
+        }
+    };
 
     public AudioRecorderView(Context context) {
         super(context);
@@ -75,11 +209,17 @@ public class AudioRecorderView extends RelativeLayout {
         init();
     }
 
+
+//================================================================================
+// Listeners to buttons
+//================================================================================
+
     public AudioRecorderView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
+    @TargetApi(21)
     public AudioRecorderView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init();
@@ -89,34 +229,44 @@ public class AudioRecorderView extends RelativeLayout {
      * Initialize all views and inflate the xml layout to the view
      */
     private void init() {
-        inflate(getContext(), R.layout.view_audio_recorder, this);
+        final int view_audio_recorderLayoutId = this.getContext().getResources().getIdentifier("view_audio_recorder", "layout", getContext().getPackageName());
+        final int view_audio_recorderViewId = this.getContext().getResources().getIdentifier("view_audio_recorder", "id", getContext().getPackageName());
+        final int viewSwitcher_audio_recorder = this.getContext().getResources().getIdentifier("viewSwitcher_audio_recorder", "id", getContext().getPackageName());
+        final int img_button_start_record = this.getContext().getResources().getIdentifier("img_button_start_record", "id", getContext().getPackageName());
+        final int img_button_reject_audio = this.getContext().getResources().getIdentifier("img_button_reject_audio", "id", getContext().getPackageName());
+        final int img_button_play = this.getContext().getResources().getIdentifier("img_button_play", "id", getContext().getPackageName());
+        final int img_button_accept_audio = this.getContext().getResources().getIdentifier("img_button_accept_audio", "id", getContext().getPackageName());
+        final int img_button_close_view = this.getContext().getResources().getIdentifier("img_button_close_view", "id", getContext().getPackageName());
+        final int text_view_counter = this.getContext().getResources().getIdentifier("text_view_counter", "id", getContext().getPackageName());
 
-        (findViewById(R.id.view_audio_recorder)).setOnClickListener(new OnClickListener() {
+        inflate(getContext(), view_audio_recorderLayoutId, this);
+
+        (findViewById(view_audio_recorderViewId)).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
         });
 
-        mViewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher_audio_recorder);
+        mViewSwitcher = (ViewSwitcher) findViewById(viewSwitcher_audio_recorder);
 
-        ImageButton startRecord = (ImageButton) findViewById(R.id.img_button_start_record);
+        ImageButton startRecord = (ImageButton) findViewById(img_button_start_record);
         startRecord.setOnClickListener(onClickListenerStartRecord);
 
-        ImageButton imageButtonRejectRecord = (ImageButton) findViewById(R.id.img_button_reject_audio);
+        ImageButton imageButtonRejectRecord = (ImageButton) findViewById(img_button_reject_audio);
         imageButtonRejectRecord.setOnClickListener(onClickListenerRejectAudio);
 
-        ImageButton playRecordButton = (ImageButton) findViewById(R.id.img_button_play);
+        ImageButton playRecordButton = (ImageButton) findViewById(img_button_play);
         playRecordButton.setOnClickListener(onClickListenerPlayRecord);
 
-        ImageButton acceptAudioButton = (ImageButton) findViewById(R.id.img_button_accept_audio);
+        ImageButton acceptAudioButton = (ImageButton) findViewById(img_button_accept_audio);
         acceptAudioButton.setOnClickListener(onClickListenerAcceptAudio);
 
-        ImageButton closeView = (ImageButton) findViewById(R.id.img_button_close_view);
+        ImageButton closeView = (ImageButton) findViewById(img_button_close_view);
         closeView.setOnClickListener(onClickListenerCloseView);
 
         //Get View of TextView Counter
-        textViewCounter = (TextView) findViewById(R.id.text_view_counter);
+        textViewCounter = (TextView) findViewById(text_view_counter);
         textViewCounter.setTextColor(Color.WHITE);
 
         // Initialize the Handler to update the text view counter
@@ -159,155 +309,6 @@ public class AudioRecorderView extends RelativeLayout {
         this.mAudioRecorderListener = audioRecorderListener;
     }
 
-    // Initialization of Runnable to update counter of time record
-    Runnable UpdateRecordTime = new Runnable() {
-        public void run() {
-            if (isRecording) {
-                if (recordTime == 60) {
-                    recordTime = 0;
-                    minutes++;
-                }
-                textViewCounter.setText(String.valueOf("" + (minutes > 9 ? minutes : "0" + minutes) + ":" + (recordTime > 9 ? recordTime : "0" + recordTime)));
-                recordTime += 1;
-// Delay 1s before next call
-                handler.postDelayed(this, 1000);
-            }
-        }
-    };
-
-
-//================================================================================
-// Listeners to buttons
-//================================================================================
-
-    private OnClickListener onClickListenerStartRecord = new OnClickListener() {
-        @Override
-        public void onClick(final View v) {
-//v.setSelected(true);
-            if (!isRecording) {
-                vibrate();
-                setStopImageDrawable(v, R.drawable.stop_button);
-                mRecorder = new MediaRecorder();
-                mRecorder.setAudioSource(AUDIO_SOURCE);
-                mRecorder.setOutputFormat(OUTPUT_FORMAT);
-
-// Generate file name and get the path to save the files
-                FileManager fileManager = new FileManager(getContext());
-                fileName = fileManager.createFileName(EXTENSION_FILE);
-                filePath = fileManager.getFileName(fileName);
-
-                mRecorder.setOutputFile(filePath);
-                mRecorder.setAudioEncoder(AUDIO_ENCODER);
-// If on the plugin receive as a parameter the record limit time, should be defined on Media Recorder
-                if (recordLimitTime > 0)
-                    mRecorder.setMaxDuration(recordLimitTime);
-
-                mRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
-                    @Override
-                    public void onInfo(MediaRecorder mr, int what, int extra) {
-                        if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED)
-                            stopRecord((ImageButton) v);
-                    }
-                });
-
-                try {
-                    mRecorder.prepare();
-
-                    mRecorder.start();
-                    isRecording = true;
-                    handler.post(UpdateRecordTime);
-                } catch (IOException e) {
-                    Log.e(AudioRecorderPlugin.LOG_TAG, "prepare() failed");
-                    sendErrorCallback(AudioRecorderPlugin.ERROR_INTERNAL, "Failed on start record");
-                }
-            } else if (isRecording) {
-                stopRecord((ImageButton) v);
-            }
-        }
-    };
-
-    private OnClickListener onClickListenerPlayRecord = new OnClickListener() {
-
-        @Override
-        public void onClick(final View v) {
-            if (mPlayer == null || !mPlayer.isPlaying()) {
-                setStopImageDrawable(v, R.drawable.stop_button);
-                mPlayer = new MediaPlayer();
-                try {
-                    if (filePath != null && !filePath.isEmpty()) {
-                        Log.e("AudioRecord", filePath);
-                        mPlayer.reset();
-                        FileInputStream fis = new FileInputStream(filePath);
-                        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                        mPlayer.setDataSource(fis.getFD());
-                        mPlayer.prepare();
-                        mPlayer.start();
-
-
-
-                        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                Log.i(AudioRecorderPlugin.LOG_TAG, "OnCompletion Player");
-
-                                stopMediaPlayer((ImageButton) v);
-                            }
-                        });
-                    }
-                } catch (IOException e) {
-                    Log.e(AudioRecorderPlugin.LOG_TAG, "prepare() failed", e);
-                    sendErrorCallback(AudioRecorderPlugin.ERROR_INTERNAL, "Failed on start player");
-                }
-            } else {
-                mPlayer.stop();
-                stopMediaPlayer((ImageButton) v);
-            }
-        }
-    };
-
-    private OnClickListener onClickListenerRejectAudio = new OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-            if (mPlayer != null && mPlayer.isPlaying()) {
-                mPlayer.release();
-                mPlayer = null;
-            }
-
-// Delete file when the clip is rejected
-            if (new FileManager(getContext()).deleteFileByName(fileName))
-                Log.i(AudioRecorderPlugin.LOG_TAG, "File delete with success");
-            textViewCounter.setText("00:00");
-            setStopImageDrawable(findViewById(R.id.img_button_play), R.drawable.play_button);
-
-            mViewSwitcher.showPrevious();
-        }
-    };
-
-    private OnClickListener onClickListenerAcceptAudio = new OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-            stopMediaPlayer(null);
-
-            sendSuccessCallback(filePath, fileName);
-        }
-    };
-
-    private OnClickListener onClickListenerCloseView = new OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-// Delete file when close the view
-            if (new FileManager(getContext()).deleteFileByName(fileName))
-                Log.i(AudioRecorderPlugin.LOG_TAG, "File delete with success");
-
-            stopRecord(null);
-            stopMediaPlayer(null);
-            sendErrorCallback(AudioRecorderPlugin.ERROR_CODE_CANCEL, "The audio record was canceled.");
-        }
-    };
-
 //================================================================================
 // Callback Results
 //================================================================================
@@ -342,8 +343,10 @@ public class AudioRecorderView extends RelativeLayout {
      */
     private void stopRecord(ImageButton imageButton) {
 //imageButton.setImageResource(R.drawable.ic_play_arrow_audio);
-        if (imageButton != null)
-            setStopImageDrawable(imageButton, R.drawable.record_button);
+        if (imageButton != null) {
+            final int record_button = getContext().getResources().getIdentifier("record_button", "drawable", getContext().getPackageName());
+            setStopImageDrawable(imageButton, record_button);
+        }
 
         if (mRecorder != null) {
             mRecorder.stop();
@@ -363,9 +366,10 @@ public class AudioRecorderView extends RelativeLayout {
      * @param imageButton
      */
     private void stopMediaPlayer(ImageButton imageButton) {
-        if (imageButton != null)
-            setStopImageDrawable(imageButton, R.drawable.play_button);
-
+        if (imageButton != null) {
+            final int play_button = getContext().getResources().getIdentifier("play_button", "drawable", getContext().getPackageName());
+            setStopImageDrawable(imageButton, play_button);
+        }
         if (mPlayer != null) {
             mPlayer.release();
             mPlayer = null;
