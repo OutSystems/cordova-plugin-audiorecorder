@@ -1,0 +1,20 @@
+{
+  "version": "1.0.3",
+  "name": "cordova-plugin-audiorecorder-outsystems",
+  "cordova_name": "AudioRecorder",
+  "description": "Record Audio easily with the device microphone",
+  "license": "MIT",
+  "repo": "https://github.com/OutSystems/cordova-plugin-audiorecorder",
+  "issue": "",
+  "keywords": [],
+  "platforms": [
+    "android",
+    "ios"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.5.0"
+    }
+  ]
+}
